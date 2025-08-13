@@ -1,0 +1,26 @@
+# Enable URL rewriting
+RewriteEngine On
+RewriteBase /
+
+# Protect sensitive files
+<FilesMatch "(\.env|config\.php|schema\.sql|composer\.json|composer\.lock)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Allow CORS for API (change domain if needed)
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# Remove .php extension from URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.+)$ $1.php [L,QSA]
+
+# Redirect all unknown requests to index.php (API routing fallback)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
